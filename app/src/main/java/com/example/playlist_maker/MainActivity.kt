@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ContentMain()
+            MainView()
         }
     }
 }
@@ -99,7 +99,7 @@ fun MainMenuButton(
 
 @Preview(device = Devices.DEFAULT)
 @Composable
-fun ContentMain()
+fun MainView()
 {
     val myBlue = Color(red = 55, green = 114, blue = 231)
     val context = LocalContext.current

@@ -19,9 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,7 +31,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.playlist_maker.ui.theme.Playlist_makerTheme
@@ -43,7 +40,7 @@ class SettingsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            SettingsMain()
+            SettingsView()
         }
     }
 }
@@ -52,17 +49,15 @@ class SettingsActivity : ComponentActivity() {
 @Composable
 fun SettingsPreview() {
     Playlist_makerTheme {
-        SettingsMain()
+        SettingsView()
     }
 }
 @Composable
-fun SettingsMain()
+fun SettingsView()
 {
     val context = LocalContext.current
 
-    val email = stringResource(R.string.developer_email)
-    val subject = stringResource(R.string.developer_email_subject)
-    val body = stringResource(R.string.developer_email_body)
+
 
     val maintext = TextStyle(
         color = Color.Black,
@@ -92,20 +87,29 @@ fun SettingsMain()
             iconRes = R.drawable.switch_off,
             onClick = {}
         )
+
+        val app_sharing_text = stringResource(R.string.app_sharing_text)
         ActionRow(
             textRes = R.string.share_app,
             iconRes = R.drawable.share_gray,
-            onClick = {}
+            onClick = {send(context,app_sharing_text)}
         )
+
+        val email = stringResource(R.string.developer_email)
+        val subject = stringResource(R.string.developer_email_subject)
+        val body = stringResource(R.string.developer_email_body)
         ActionRow(
             textRes = R.string.write_to_support,
             iconRes = R.drawable.support_gray,
             onClick = {sendThroughMail(context, email, subject, body)}
         )
+
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.data = Uri.parse(stringResource(R.string.user_agreement_link))
         ActionRow(
             textRes = R.string.user_agreement,
             iconRes = R.drawable.arrow_forward_gray,
-            onClick = {}
+            onClick = {context.startActivity(intent)}
         )
 
     }
@@ -157,4 +161,15 @@ fun sendThroughMail(
         putExtra(Intent.EXTRA_TEXT, body)
     }
     context.startActivity(intent)
+}
+
+fun send(context: Context, message: String)
+{
+    val sendIntent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_TEXT, message)
+        type = "text/plain"
+    }
+    val shareIntent = Intent.createChooser(sendIntent, null)
+    context.startActivity(shareIntent)
 }

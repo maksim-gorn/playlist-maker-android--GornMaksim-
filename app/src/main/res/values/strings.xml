@@ -14,5 +14,6 @@
     <string name="developer_email">g0rnmak@yandex.ru</string>
     <string name="developer_email_subject">Сообщение разработчикам и разработчицам приложения Playlist Maker</string>
     <string name="developer_email_body">Спасибо разработчикам и разработчицам за крутое приложение!</string>
-    <string name="services_offer">https://yandex.ru/legal/practicum_offer/ru/</string>
+    <string name="user_agreement_link">https://yandex.ru/legal/practicum_offer/ru/</string>
+    <string name="app_sharing_text">Скачайте приложение по ссылке! https://www.youtube.com/watch?v=dQw4w9WgXcQ</string>
 </resources>

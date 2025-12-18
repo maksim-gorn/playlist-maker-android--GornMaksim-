@@ -57,7 +57,7 @@ class SearchActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MainView()
+            SearchView()
         }
     }
 }
@@ -68,7 +68,7 @@ class SearchActivity : ComponentActivity() {
     showBackground = true
 )
 @Composable
-fun MainView(){
+fun SearchView(){
 
     val maintext = TextStyle(
         color = Color.Black,
