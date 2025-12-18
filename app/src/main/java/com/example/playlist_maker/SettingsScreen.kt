@@ -2,11 +2,6 @@ package com.example.playlist_maker
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,27 +28,20 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.playlist_maker.ui.theme.Playlist_makerTheme
+import androidx.core.net.toUri
+import androidx.navigation.NavHostController
 
-class SettingsActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            SettingsView()
-        }
-    }
-}
 
 @Preview(showBackground = true, device = Devices.DEFAULT, showSystemUi = true)
 @Composable
 fun SettingsPreview() {
-    Playlist_makerTheme {
+    _root_ide_package_.com.example.playlist_maker.ui.theme.Playlist_makerTheme {
         SettingsView()
     }
 }
+
 @Composable
-fun SettingsView()
+fun SettingsView(navController: NavHostController? = null)
 {
     val context = LocalContext.current
 
@@ -76,7 +64,8 @@ fun SettingsView()
         {
             Image(painter = painterResource(id = R.drawable.arrow_back),
                 contentDescription = null,
-                modifier = Modifier.padding(16.dp))
+                modifier = Modifier.padding(16.dp).
+                clickable(onClick = {navController?.popBackStack()}))
             Text(stringResource(R.string.settings), style = maintext, modifier = Modifier.padding(
                 start = 12.dp, top = 10.dp, bottom = 12.dp)
             )
@@ -88,11 +77,11 @@ fun SettingsView()
             onClick = {}
         )
 
-        val app_sharing_text = stringResource(R.string.app_sharing_text)
+        val appSharingText = stringResource(R.string.app_sharing_text)
         ActionRow(
             textRes = R.string.share_app,
             iconRes = R.drawable.share_gray,
-            onClick = {send(context,app_sharing_text)}
+            onClick = {send(context,appSharingText)}
         )
 
         val email = stringResource(R.string.developer_email)
@@ -105,7 +94,7 @@ fun SettingsView()
         )
 
         val intent = Intent(Intent.ACTION_VIEW)
-        intent.data = Uri.parse(stringResource(R.string.user_agreement_link))
+        intent.data = stringResource(R.string.user_agreement_link).toUri()
         ActionRow(
             textRes = R.string.user_agreement,
             iconRes = R.drawable.arrow_forward_gray,
@@ -155,7 +144,7 @@ fun sendThroughMail(
     body: String
 ) {
     val intent = Intent(Intent.ACTION_SENDTO).apply {
-        data = Uri.parse("mailto:")
+        data = "mailto:".toUri()
         putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
         putExtra(Intent.EXTRA_SUBJECT, subject)
         putExtra(Intent.EXTRA_TEXT, body)
