@@ -1,10 +1,5 @@
-package com.example.playlist_maker
+package com.example.playlist_maker.ui.main
 
-import android.content.Intent
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -19,38 +14,27 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.playlist_maker.ui.theme.Playlist_makerTheme
-
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            ContentMain()
-        }
-    }
-}
-
+import androidx.navigation.NavHostController
+import com.example.playlist_maker.R
 
 @Composable
 fun MainMenuButton(
-    buttontext: String,
-    icon: Int?,
+    buttontext: Int,
+    icon: Int,
     onClick: () -> Unit
 ) {
     val maintext = TextStyle(
@@ -78,19 +62,16 @@ fun MainMenuButton(
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (icon != null) {
-                Image(
-                    painter = painterResource(id = icon),
-                    contentDescription = null
-                )
-            }
+            Image(
+                painter = painterResource(id = icon),
+                contentDescription = null
+            )
 
             Text(
-                text = buttontext,
+                text = stringResource(id = buttontext),
                 style = maintext,
                 modifier = Modifier.padding(start = 6.dp)
             )
-
             Spacer(modifier = Modifier.weight(1f))
 
             Image(
@@ -101,28 +82,28 @@ fun MainMenuButton(
     }
 }
 
-@Preview(Devices.DEFAULT, )
+@Preview(device = Devices.DEFAULT)
 @Composable
-fun ContentMain()
+fun MainView(navController: NavHostController? = null)
 {
     val myBlue = Color(red = 55, green = 114, blue = 231)
-    val context = LocalContext.current
     Column (modifier = Modifier
         .background(myBlue)
         .fillMaxSize())
     {
-        //Загаловок Playlist maker(надо еще настроить отступы)
+        //Загаловок Playlist maker
         Text("Playlist maker",
             style = TextStyle
                 (
                 color = Color.White,
                 fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Medium
+
             ),
             modifier = Modifier
                 .padding(horizontal = 16.dp, vertical = 14.dp)
                 .fillMaxWidth()
-                .fillMaxHeight(0.0875f)
+                .fillMaxHeight(0.0575f)
         )
         //белый бокс скругленный сверху
         Box(modifier = Modifier
@@ -140,18 +121,20 @@ fun ContentMain()
             //колонка с разными кнопками и их значками и текстом
             Column(modifier = Modifier.padding(top = 8.dp))
             {
-                MainMenuButton("Поиск", R.drawable.search_icon, onClick = { context.startActivity(
-                    Intent(context, SearchActivity::class.java)
-                )})
-                MainMenuButton("Плейлисты", R.drawable.melody_icon, onClick = {print("Нажали Плейлисты")})
-                MainMenuButton("Избранное", R.drawable.favorite_icon, onClick = {print("Нажали Избранное")})
-                MainMenuButton("Настройки", R.drawable.settings_icon, onClick = { context.startActivity(
-                    Intent(context, SettingsActivity::class.java)
-                )})
-                //остались еще кнопки плейлисты настройки и избранное
+                MainMenuButton(
+                    R.string.search, R.drawable.search_icon,
+                    onClick = { navController?.navigate("search")})
+                MainMenuButton(
+                    R.string.playlists, R.drawable.melody_icon,
+                    onClick = {print("Нажали Плейлисты")})
+                MainMenuButton(
+                    R.string.favorite, R.drawable.favorite_icon,
+                    onClick = {print("Нажали Избранное")})
+                MainMenuButton(
+                    R.string.settings, R.drawable.settings_icon,
+                    onClick = { navController?.navigate("settings")})
             }
         }
 
     }
 }
-

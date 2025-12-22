@@ -1,4 +1,4 @@
-package com.example.playlist_maker
+package com.example.playlist_maker.ui.settings
 
 import android.content.Context
 import android.content.Intent
@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
+import com.example.playlist_maker.R
 
 
 @Preview(showBackground = true, device = Devices.DEFAULT, showSystemUi = true)
