@@ -126,10 +126,10 @@ fun MainView(navController: NavHostController? = null)
                     onClick = { navController?.navigate("search")})
                 MainMenuButton(
                     R.string.playlists, R.drawable.melody_icon,
-                    onClick = {print("Нажали Плейлисты")})
+                    onClick = {navController?.navigate("playlists")})
                 MainMenuButton(
                     R.string.favorite, R.drawable.favorite_icon,
-                    onClick = {print("Нажали Избранное")})
+                    onClick = {navController?.navigate("favorites")})
                 MainMenuButton(
                     R.string.settings, R.drawable.settings_icon,
                     onClick = { navController?.navigate("settings")})
