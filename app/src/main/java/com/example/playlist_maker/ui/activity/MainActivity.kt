@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.playlist_maker.ui.ScreenRoute
 import com.example.playlist_maker.ui.favorites.FavoritesView
 import com.example.playlist_maker.ui.main.MainView
 import com.example.playlist_maker.ui.playlists.PlaylistsView
@@ -51,33 +52,30 @@ fun AppHost(
 
     NavHost(
         navController = navController,
-        startDestination = "main"
+        startDestination = ScreenRoute.Main.route  // Используем enum
     ) {
-        composable("main") {
+        composable(ScreenRoute.Main.route) {
             MainView(navController)
         }
-        composable("search") {
-            //SearchView(viewModel = searchViewModel, navController = navController)
+        composable(ScreenRoute.Search.route) {
             SearchView(
                 modifier = Modifier.padding(all = 1.dp),
                 searchViewModel = searchViewModel,
                 onClick = {},
                 navController = navController
             )
-
         }
-        composable("favorites") {
+        composable(ScreenRoute.Favorites.route) {
             FavoritesView(navController)
         }
-        composable("playlists") {
+        composable(ScreenRoute.Playlists.route) {
             PlaylistsView(
                 modifier = Modifier,
                 playlistsViewModel = playlistsViewModel,
-                navController=navController
-
-                )
+                navController = navController
+            )
         }
-        composable("settings") {
+        composable(ScreenRoute.Settings.route) {
             SettingsView(navController)
         }
     }

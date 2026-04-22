@@ -19,6 +19,100 @@ class DatabaseMock(
     private val playlists = mutableListOf<Playlist>()
     private val tracks = mutableListOf<Track>()
 
+
+    val listTracks = listOf(
+        Track(
+            id = 1L,
+            trackName = "Владивосток 2000",
+            artistName = "Мумий Троль",
+            trackTime = "2:38",
+            image = "",
+            favorite = false,
+            playlistId = 0L
+        ),
+        Track(
+            id = 2L,
+            trackName = "Группа крови",
+            artistName = "Кино",
+            trackTime = "4:43",
+            image = "",
+            favorite = false,
+            playlistId = 0L
+        ),
+        Track(
+            id = 3L,
+            trackName = "Не смотри назад",
+            artistName = "Ария",
+            trackTime = "5:12",
+            image = "",
+            favorite = false,
+            playlistId = 0L
+        ),
+        Track(
+            id = 4L,
+            trackName = "Звезда по имени Солнце",
+            artistName = "Кино",
+            trackTime = "3:45",
+            image = "",
+            favorite = false,
+            playlistId = 0L
+        ),
+        Track(
+            id = 5L,
+            trackName = "Лондон",
+            artistName = "Аквариум",
+            trackTime = "4:32",
+            image = "",
+            favorite = false,
+            playlistId = 0L
+        ),
+        Track(
+            id = 6L,
+            trackName = "На заре",
+            artistName = "Альянс",
+            trackTime = "3:50",
+            image = "",
+            favorite = false,
+            playlistId = 0L
+        ),
+        Track(
+            id = 7L,
+            trackName = "Перемен",
+            artistName = "Кино",
+            trackTime = "4:56",
+            image = "",
+            favorite = false,
+            playlistId = 0L
+        ),
+        Track(
+            id = 8L,
+            trackName = "Розовый фламинго",
+            artistName = "Сплин",
+            trackTime = "3:15",
+            image = "",
+            favorite = false,
+            playlistId = 0L
+        ),
+        Track(
+            id = 9L,
+            trackName = "Танцевать",
+            artistName = "Мельница",
+            trackTime = "3:42",
+            image = "",
+            favorite = false,
+            playlistId = 0L
+        ),
+        Track(
+            id = 10L,
+            trackName = "Чёрный бумер",
+            artistName = "Серега",
+            trackTime = "4:01",
+            image = "",
+            favorite = false,
+            playlistId = 0L
+        )
+    )
+
     init {
         this.tracks.addAll(listTracks)
     }
@@ -100,100 +194,14 @@ class DatabaseMock(
         tracks.removeIf { it.playlistId == playlistId }
     }
 
+
     fun searchTracks(expression: String): List<Track> {
-        return tracks.filter { it.trackName.contains(expression, true) }
+        var tracksToReturn = tracks.filter {it.trackName.contains(expression, true)
+                || it.artistName.contains(expression, true)}
+        Log.d("DatabaseMock", "searchTracks was called")
+        Log.d("DatabaseMock", "returning " + tracksToReturn.size+" tracks")
+        return tracksToReturn
+
     }
 }
 
-val listTracks = listOf(
-    Track(
-        id = 1L,
-        trackName = "Владивосток 2000",
-        artistName = "Мумий Троль",
-        trackTime = "2:38",
-        image = "",
-        favorite = false,
-        playlistId = 0L
-    ),
-    Track(
-        id = 2L,
-        trackName = "Группа крови",
-        artistName = "Кино",
-        trackTime = "4:43",
-        image = "",
-        favorite = false,
-        playlistId = 0L
-    ),
-    Track(
-        id = 3L,
-        trackName = "Не смотри назад",
-        artistName = "Ария",
-        trackTime = "5:12",
-        image = "",
-        favorite = false,
-        playlistId = 0L
-    ),
-    Track(
-        id = 4L,
-        trackName = "Звезда по имени Солнце",
-        artistName = "Кино",
-        trackTime = "3:45",
-        image = "",
-        favorite = false,
-        playlistId = 0L
-    ),
-    Track(
-        id = 5L,
-        trackName = "Лондон",
-        artistName = "Аквариум",
-        trackTime = "4:32",
-        image = "",
-        favorite = false,
-        playlistId = 0L
-    ),
-    Track(
-        id = 6L,
-        trackName = "На заре",
-        artistName = "Альянс",
-        trackTime = "3:50",
-        image = "",
-        favorite = false,
-        playlistId = 0L
-    ),
-    Track(
-        id = 7L,
-        trackName = "Перемен",
-        artistName = "Кино",
-        trackTime = "4:56",
-        image = "",
-        favorite = false,
-        playlistId = 0L
-    ),
-    Track(
-        id = 8L,
-        trackName = "Розовый фламинго",
-        artistName = "Сплин",
-        trackTime = "3:15",
-        image = "",
-        favorite = false,
-        playlistId = 0L
-    ),
-    Track(
-        id = 9L,
-        trackName = "Танцевать",
-        artistName = "Мельница",
-        trackTime = "3:42",
-        image = "",
-        favorite = false,
-        playlistId = 0L
-    ),
-    Track(
-        id = 10L,
-        trackName = "Чёрный бумер",
-        artistName = "Серега",
-        trackTime = "4:01",
-        image = "",
-        favorite = false,
-        playlistId = 0L
-    )
-)

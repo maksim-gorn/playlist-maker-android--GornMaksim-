@@ -50,7 +50,7 @@ fun PlaylistListItem(playlist: Playlist, onClick: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Image(
-            modifier = Modifier.size(48.dp),
+            modifier = Modifier.size(56.dp),
             painter = painterResource(id = R.drawable.ic_music),
             contentDescription = playlist.name,
             colorFilter = ColorFilter.tint(Color.Gray)
@@ -59,51 +59,14 @@ fun PlaylistListItem(playlist: Playlist, onClick: () -> Unit) {
             modifier = Modifier.weight(1f),
             horizontalAlignment = Alignment.Start
         ) {
-            Text(playlist.name, fontSize = 16.sp)
+            Text(playlist.name, fontSize = 20.sp)
             val text = "${playlist.tracks.size} tracks"
-            Text(text, fontSize = 11.sp, color = Color.Gray)
+            Text(text, fontSize = 14.sp, color = Color.Gray)
         }
     }
 }
 
 
-//
-//@Composable
-//fun PlaylistsView(navController: NavHostController? = null) {
-//    val maintext = TextStyle(
-//        color = Color.Black,
-//        fontSize = 21.sp,
-//        fontWeight = FontWeight.Medium
-//    )
-//
-//    Column(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .background(Color.White)
-//    )
-//    {
-//        Row(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(66.dp),
-//            verticalAlignment = Alignment.CenterVertically
-//        )
-//        {
-//            Image(
-//                painter = painterResource(id = R.drawable.arrow_back),
-//                contentDescription = null,
-//                modifier = Modifier.padding(16.dp)
-//                    .clickable(onClick = { navController?.popBackStack() })
-//            )
-//            Text(
-//                text = stringResource(R.string.playlists), style = maintext,
-//                modifier = Modifier.padding(
-//                    start = 12.dp, top = 10.dp, bottom = 12.dp
-//                )
-//            )
-//        }
-//    }
-//}
 
 @Composable
 fun PlaylistsView(
@@ -120,12 +83,12 @@ fun PlaylistsView(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 8.dp)
+                .padding(top = 16.dp)
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.LightGray.copy(alpha = 0.7f)),
+                    .padding(horizontal = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
@@ -135,7 +98,9 @@ fun PlaylistsView(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.arrow_back)
                 )
-                Text("Playlists", fontSize = 32.sp)
+                Text(stringResource(R.string.playlists),
+                    fontSize = 30.sp,
+                    modifier = Modifier.padding(start = 20.dp))
             }
 
             Column(
@@ -148,7 +113,6 @@ fun PlaylistsView(
                         PlaylistListItem(playlist = playlists[index]) {
                             //navigateToPlaylist(index.toLong())
                         }
-                        HorizontalDivider(thickness = 0.5.dp)
                     }
                 }
             }

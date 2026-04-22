@@ -23,6 +23,12 @@ class PlaylistsViewModel() : ViewModel() {
     // Используем мок базы вместо репозитория
     private val databaseRepository: DatabaseMock = DatabaseMock(scope = viewModelScope)
 
+    init {
+        this.createNewPlayList("Тестовый 1", "Тестовый плейлист 1 для проверки отображения")
+        this.createNewPlayList("Тестовый 2", "Тестовый плейлист 2 для проверки отображения")
+        this.createNewPlayList("Тестовый 3", "Тестовый плейлист 3 для проверки отображения")
+    }
+
     val playlists: Flow<List<Playlist>> = flow {
         val collectedPlaylists = mutableListOf<Playlist>()
         playlistsRepository.getAllPlaylists().collect { playlist ->

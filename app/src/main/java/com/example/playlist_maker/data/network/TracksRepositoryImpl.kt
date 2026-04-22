@@ -9,19 +9,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 
-//class TracksRepositoryImpl() : TracksRepository {
-//    override suspend fun getAllTracks(): List<Track> {
-//        delay(1000)// Имитируем запрос к серверу
-//        return listTracks
-//    }
-//
-//    override suspend fun searchTracks(expression: String): List<Track> {
-//        delay(1000)// Имитируем запрос к серверу
-//        return listTracks.filter { it.trackName.lowercase().contains(expression.lowercase())
-//                || it.artistName.lowercase().contains(expression.lowercase()) }
-//    }
-//}
-
 class TracksRepositoryImpl(
     private val scope: CoroutineScope
 ) : TracksRepository {

@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.playlist_maker.R
+import com.example.playlist_maker.ui.ScreenRoute
 
 @Composable
 fun MainMenuButton(
@@ -119,20 +120,23 @@ fun MainView(navController: NavHostController? = null)
             )
         ){
             //колонка с разными кнопками и их значками и текстом
-            Column(modifier = Modifier.padding(top = 8.dp))
-            {
+            Column(modifier = Modifier.padding(top = 8.dp)) {
                 MainMenuButton(
                     R.string.search, R.drawable.search_icon,
-                    onClick = { navController?.navigate("search")})
+                    onClick = { navController?.navigate(ScreenRoute.Search.route) }
+                )
                 MainMenuButton(
                     R.string.playlists, R.drawable.melody_icon,
-                    onClick = {navController?.navigate("playlists")})
+                    onClick = { navController?.navigate(ScreenRoute.Playlists.route) }
+                )
                 MainMenuButton(
                     R.string.favorite, R.drawable.favorite_icon,
-                    onClick = {navController?.navigate("favorites")})
+                    onClick = { navController?.navigate(ScreenRoute.Favorites.route) }
+                )
                 MainMenuButton(
                     R.string.settings, R.drawable.settings_icon,
-                    onClick = { navController?.navigate("settings")})
+                    onClick = { navController?.navigate(ScreenRoute.Settings.route) }
+                )
             }
         }
 

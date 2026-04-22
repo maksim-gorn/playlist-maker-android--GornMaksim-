@@ -1,5 +1,6 @@
 package com.example.playlist_maker.ui.search
 
+import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -64,7 +65,7 @@ fun TrackListItem(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
-                onClick = { onClick() },
+                onClick = { Log.d("SearchScreen", "clicked on track by the id = "+track.id) },
                 onLongClick = { onLongClick?.invoke() }
             ),
         verticalAlignment = Alignment.CenterVertically,
