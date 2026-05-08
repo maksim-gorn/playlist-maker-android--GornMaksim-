@@ -8,6 +8,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
@@ -19,7 +21,7 @@ class DatabaseMock(
     private val playlists = mutableListOf<Playlist>()
     private val tracks = mutableListOf<Track>()
 
-
+    private val _tracksUpdates = MutableSharedFlow<Unit>()
     val listTracks = listOf(
         Track(
             id = 1L,
@@ -182,6 +184,7 @@ class DatabaseMock(
     fun insertTrack(track: Track) {
         tracks.removeIf { it.id == track.id }
         tracks.add(track)
+        notifyTracksChanged() // Добавьте эту строку
     }
 
     fun getFavoriteTracks(): Flow<List<Track>> = flow {
@@ -203,5 +206,24 @@ class DatabaseMock(
         return tracksToReturn
 
     }
+
+    fun getTrackById(trackId: Long): Flow<Track?> = flow {
+        while (true) {
+            val track = tracks.find { it.id == trackId }
+            emit(track)
+            // ждем обновление
+            _tracksUpdates.first()
+        }
+    }.catch { e ->
+
+        emit(null)
+    }
+
+    private fun notifyTracksChanged() {
+        scope.launch(Dispatchers.IO) {
+            _tracksUpdates.emit(Unit)
+        }
+    }
+
 }
 

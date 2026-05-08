@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.playlist_maker.R
-import com.example.playlist_maker.ui.ScreenRoute
+import com.example.playlist_maker.ui.activity.ScreenRoute
 
 @Composable
 fun MainMenuButton(

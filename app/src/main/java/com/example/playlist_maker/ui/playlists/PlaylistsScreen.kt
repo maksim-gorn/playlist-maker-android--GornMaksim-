@@ -72,7 +72,7 @@ fun PlaylistListItem(playlist: Playlist, onClick: () -> Unit) {
 fun PlaylistsView(
     modifier: Modifier,
     playlistsViewModel: PlaylistsViewModel,
-    //addNewPlaylist: () -> Unit,
+    addNewPlaylist: () -> Unit,
     //navigateToPlaylist: (Long) -> Unit,
     //navigateBack: () -> Unit,
     navController: NavHostController? = null
@@ -122,7 +122,7 @@ fun PlaylistsView(
                 .padding(32.dp)
                 .align(Alignment.BottomEnd),
             onClick = {
-                //addNewPlaylist()
+                addNewPlaylist()
                       },
             containerColor = Color.Gray,
             contentColor = Color.White,

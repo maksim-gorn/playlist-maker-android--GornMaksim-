@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -59,18 +60,18 @@ import com.example.playlist_maker.data.network.Track
 fun TrackListItem(
     track: Track,
     onLongClick: (() -> Unit)? = null,
-    onClick: () -> Unit
+    onClick: (Long) -> Unit  //передаем ID
 ) {
+    val trackId = track.id
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
-                onClick = { Log.d("SearchScreen", "clicked on track by the id = "+track.id) },
+                onClick = { onClick(trackId)},  // передаем ID
                 onLongClick = { onLongClick?.invoke() }
             ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
-
     ) {
         Column(
             modifier = Modifier.weight(0.25f),
@@ -110,7 +111,7 @@ fun SearchView(
     navController: NavHostController? = null,
     modifier: Modifier,
     searchViewModel: SearchViewModel,
-    onClick: (Int?) -> Unit
+    onClick: (Long?) -> Unit
 ) {
     val screenState by searchViewModel.searchScreenState.collectAsState()
     var historyList by remember { mutableStateOf<List<String>>(emptyList()) }
@@ -342,7 +343,7 @@ private fun SearchResultsContent(
     screenState: SearchState,
     text: String,
     modifier: Modifier,
-    onClick: (Int?) -> Unit
+    onClick: (Long?) -> Unit
 ) {
     when (screenState) {
         is SearchState.Initial -> {
@@ -385,13 +386,17 @@ private fun SearchResultsContent(
                     )
                 }
             } else {
-                LazyColumn {
-                    items(tracks.size) { index ->
+                LazyColumn { // нужно передавать иммено глобальный id трэка
+                    items(
+                        items = tracks,
+                        key = { it.id }
+                    ) { track ->
                         TrackListItem(
-                            track = tracks[index]
-                        ) {
-                            onClick(index)
-                        }
+                            track = track,
+                            onClick = { id ->
+                                onClick(id)
+                            }
+                        )
                     }
                 }
             }
