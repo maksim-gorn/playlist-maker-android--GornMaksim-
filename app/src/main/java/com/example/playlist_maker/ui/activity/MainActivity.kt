@@ -84,7 +84,10 @@ fun AppHost(
             )
         }
         composable(ScreenRoute.Favorites.route) {
-            FavoritesView(navController)
+            FavoritesView(
+                navController = navController,
+                tracksRepository = tracksRepository
+            )
         }
         composable(ScreenRoute.Playlists.route) {
             PlaylistsView(

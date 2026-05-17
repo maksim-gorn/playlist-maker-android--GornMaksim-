@@ -1,6 +1,6 @@
 package com.example.playlist_maker.data.network
 
-import com.example.playlist_maker.data.DatabaseMock
+import com.example.playlist_maker.data.DatabaseProvider
 import com.example.playlist_maker.data.dto.TracksSearchRequest
 import com.example.playlist_maker.data.dto.TracksSearchResponse
 import com.example.playlist_maker.domain.NetworkClient
@@ -12,9 +12,7 @@ import kotlinx.coroutines.flow.Flow
 class TracksRepositoryImpl(
     private val scope: CoroutineScope
 ) : TracksRepository {
-    private val database = DatabaseMock(
-        scope = scope
-    )
+    private val database = DatabaseProvider.database
 
     override suspend fun searchTracks(expression: String): List<Track> {
         return database.searchTracks(expression)
