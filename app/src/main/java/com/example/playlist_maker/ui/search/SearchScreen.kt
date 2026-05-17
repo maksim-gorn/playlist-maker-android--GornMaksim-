@@ -1,29 +1,38 @@
 package com.example.playlist_maker.ui.search
 
+import android.util.Log
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,171 +40,384 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.playlist_maker.R
 import com.example.playlist_maker.data.network.Track
 
-
 @Composable
-fun TrackListItem(track: Track) {
+fun TrackListItem(
+    track: Track,
+    onLongClick: (() -> Unit)? = null,
+    onClick: (Long) -> Unit  //передаем ID
+) {
+    val trackId = track.id
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .combinedClickable(
+                onClick = { onClick(trackId)},  // передаем ID
+                onLongClick = { onLongClick?.invoke() }
+            ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_music),
-            contentDescription = "Трек ${track.trackName}"
+        Column(
+            modifier = Modifier.weight(0.25f),
+            horizontalAlignment = Alignment.CenterHorizontally
         )
+        {
+            Image(
+                painter = painterResource(id = R.drawable.ic_music),
+                contentDescription = "Трек ${track.trackName}"
+            )
+        }
         Column(
             modifier = Modifier.weight(1f),
             horizontalAlignment = Alignment.Start
         ) {
-            Text(track.trackName, fontWeight = FontWeight.Bold)
-            Text(track.artistName)
+            Text(track.trackName, fontSize = 18.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis )
+            Text(track.artistName + " · " + track.trackTime,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis)
         }
         Column(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(0.25f),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(track.trackTime)
+            Image(painter = painterResource(
+                id = R.drawable.arrow_forward),
+                contentDescription = "proceed icon",)
         }
     }
 }
+
 
 @Composable
 fun SearchView(
-    viewModel: SearchViewModel,
-    navController: NavHostController? = null
-)
-{
-    val maintext = TextStyle(
-        color = Color.Black,
-        fontSize = 21.sp,
-        fontWeight = FontWeight.Medium
-    )
+    navController: NavHostController? = null,
+    modifier: Modifier,
+    searchViewModel: SearchViewModel,
+    onClick: (Long?) -> Unit
+) {
+    val screenState by searchViewModel.searchScreenState.collectAsState()
+    var historyList by remember { mutableStateOf<List<String>>(emptyList()) }
+    var text by remember { mutableStateOf("") }
+    var isFocused by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .background(Color.White))
-    {
+    LaunchedEffect(text) {
+        searchViewModel.updateQuery(text)
+    }
+
+    LaunchedEffect(screenState) {
+        when (screenState) {
+            is SearchState.Success -> {
+                focusManager.clearFocus()
+            }
+            else -> Unit
+        }
+    }
+
+    LaunchedEffect(screenState) {
+        historyList = searchViewModel.getHistoryList().reversed().map { it.word }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 16.dp)
+    ) {
+        // заголовок
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(66.dp),
+                .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically
-        )
-        {
-            Image(
-                painter = painterResource(id = R.drawable.arrow_back),
-                contentDescription = null,
-                modifier = Modifier.padding(16.dp)
-                    .clickable(onClick = { navController?.popBackStack() })
+        ) {
+            Icon(
+                modifier = Modifier
+                    .size(32.dp)
+                    .clickable ( onClick = {navController?.popBackStack()} ),
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Назад",
             )
             Text(
-                text = stringResource(R.string.search), style = maintext,
-                modifier = Modifier.padding(
-                    start = 12.dp, top = 10.dp, bottom = 12.dp
-                )
+                "Поиск",
+                fontSize = 32.sp,
+                modifier = Modifier.padding(start = 20.dp)
             )
         }
 
-        SearchScreen(modifier = Modifier, viewModel = viewModel)
+        // основной контент с поиском
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp, start = 8.dp, end = 8.dp),
+        ) {
+            // объединенный контейнер для поиска и истории
+            val isExpanded = isFocused && text.isEmpty() && historyList.isNotEmpty()
 
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .animateContentSize()
+            ) {
+                // поле поиска
+                SearchInputField(
+                    text = text,
+                    onTextChange = { newText -> text = newText },
+                    onClear = {
+                        text = ""
+                        searchViewModel.clearSearch()
+                    },
+                    focusRequester = focusRequester,
+                    onFocusChanged = { isFocused = it },
+                    isExpanded = isExpanded
+                )
 
+                // история поиска (внутри того же контейнера)
+                if (isExpanded) {
+                    UnifiedHistoryList(
+                        historyList = historyList,
+                        onClick = { word -> text = word }
+                    )
+                }
+            }
+
+            // результаты поиска
+            SearchResultsContent(
+                screenState = screenState,
+                text = text,
+                modifier = modifier,
+                onClick = onClick
+            )
+        }
     }
 }
 
-
 @Composable
-fun SearchScreen(
-    modifier: Modifier,
-    viewModel: SearchViewModel
+private fun SearchInputField(
+    text: String,
+    onTextChange: (String) -> Unit,
+    onClear: () -> Unit,
+    focusRequester: FocusRequester,
+    onFocusChanged: (Boolean) -> Unit,
+    isExpanded: Boolean
 ) {
-    val screenState by viewModel.searchScreenState.collectAsState()
-    var text by remember { mutableStateOf("") }
-    val textstyle = TextStyle(
-        color = Color.Gray,
-        fontSize = 16.sp,
-    )
-    Column(
+    BasicTextField(
+        value = text,
+        onValueChange = onTextChange,
+        singleLine = true,
+        textStyle = TextStyle(
+            fontSize = 16.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        ),
         modifier = Modifier
-            .padding(top = 2.dp, start = 16.dp, end = 16.dp)
-            .fillMaxWidth(),
-    ) {
-        TextField(
-            value = text,
-            onValueChange = {
-                text = it
-            },
-            singleLine = true,
-            shape = RoundedCornerShape(8.dp),
-            colors = TextFieldDefaults.colors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent
-            ),
-            placeholder = {
-                Text(text = stringResource(R.string.search), style = textstyle)
-            },
-            leadingIcon = {
+            .fillMaxWidth()
+            .focusRequester(focusRequester)
+            .onFocusChanged { focusState ->
+                onFocusChanged(focusState.isFocused)
+            }
+            .padding(horizontal = 12.dp, vertical = 12.dp),
+        decorationBox = { innerTextField ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // иконка поиска
                 Icon(
-                    modifier = Modifier.clickable {
-                        viewModel.search(text)
-                    },
                     imageVector = Icons.Filled.Search,
-                    contentDescription = "Search Icon"
+                    contentDescription = "Поиск",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                    modifier = Modifier.size(24.dp)
                 )
-            },
-            trailingIcon = {
-                if (text.isNotEmpty()) {
-                    IconButton(onClick = {text=""; viewModel.clearSearch()}) {
-                        Icon(
-                            imageVector = Icons.Default.Clear,
-                            contentDescription = "Очистить"
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                // Поле ввода или плейсхолдер
+                Box(modifier = Modifier.weight(1f)) {
+                    if (text.isEmpty()) {
+                        Text(
+                            "Поиск",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                            fontSize = 16.sp
                         )
                     }
+                    innerTextField()
                 }
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
 
-        when (screenState) {
-            is SearchState.Initial -> {
-                Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Введите запрос для поиска")
+                // очистка
+                if (text.isNotEmpty()) {
+                    Icon(
+                        imageVector = Icons.Filled.Clear,
+                        contentDescription = "Очистить",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                        modifier = Modifier
+                            .size(20.dp)
+                            .clickable { onClear() }
+                    )
                 }
             }
+        },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Text,
+            imeAction = ImeAction.Done
+        )
+    )
+}
 
-            is SearchState.Searching -> {
-                Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+@Composable
+private fun UnifiedHistoryList(
+    historyList: List<String>,
+    onClick: (String) -> Unit
+) {
+    Column {
+        // разделитель между полем ввода и историей
+        HorizontalDivider(
+            modifier = Modifier.padding(horizontal = 12.dp),
+            thickness = 0.5.dp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f)
+        )
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = 200.dp)
+        ) {
+            items(historyList.size) { index ->
+                HistoryItem(
+                    query = historyList[index],
+                    onClick = { onClick(historyList[index]) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun HistoryItem(
+    query: String,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.history_icon),
+            contentDescription = null,
+            modifier = Modifier.size(20.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(
+            text = query,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontSize = 14.sp
+        )
+    }
+}
+
+@Composable
+private fun SearchResultsContent(
+    screenState: SearchState,
+    text: String,
+    modifier: Modifier,
+    onClick: (Long?) -> Unit
+) {
+    when (screenState) {
+        is SearchState.Initial -> {
+            if (text.isEmpty()) {
+                Box(
+                    modifier = modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Введите поисковый запрос")
+                }
+            } else {
+                Box(
+                    modifier = modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
                     CircularProgressIndicator()
                 }
             }
+        }
 
-            is SearchState.Success -> {
-                val tracks = (screenState as SearchState.Success).foundList
-                LazyColumn(
-                    modifier = modifier.fillMaxSize()
+        is SearchState.Searching -> {
+            Box(
+                modifier = modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
+        is SearchState.Success -> {
+            val tracks = screenState.foundList
+            if (tracks.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    items(tracks.size) { index ->
-                        TrackListItem(track = tracks[index])
-                        HorizontalDivider(thickness = 0.5.dp)
+                    Text(
+                        "Треки не найдены",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            } else {
+                LazyColumn { // нужно передавать иммено глобальный id трэка
+                    items(
+                        items = tracks,
+                        key = { it.id }
+                    ) { track ->
+                        TrackListItem(
+                            track = track,
+                            onClick = { id ->
+                                onClick(id)
+                            }
+                        )
                     }
                 }
             }
+        }
 
-            is SearchState.Fail -> {
-                val error = (screenState as SearchState.Fail).error
-                Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Ошибка: $error", color = Color.Red)
+        is SearchState.Fail -> {
+            val error = screenState.error
+            Box(
+                modifier = modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        "Ошибка",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                    Text(
+                        error,
+                        color = MaterialTheme.colorScheme.error,
+                        fontSize = 12.sp
+                    )
                 }
             }
         }

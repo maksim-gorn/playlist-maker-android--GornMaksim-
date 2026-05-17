@@ -17,4 +17,7 @@
     <string name="user_agreement_link">https://yandex.ru/legal/practicum_offer/ru/</string>
     <string name="app_sharing_text">Скачайте приложение по ссылке! https://www.youtube.com/watch?v=dQw4w9WgXcQ</string>
     <string name="title_activity_track">TrackActivity</string>
+    <string name="add_playlist">добавить плейлист</string>
+    <string name="search_icon">Иконка поиска</string>
+    <string name="arrow_back">Назад</string>
 </resources>
