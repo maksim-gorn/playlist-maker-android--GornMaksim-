@@ -29,6 +29,7 @@ import com.example.playlist_maker.ui.activity.ScreenRoute
 import com.example.playlist_maker.ui.favorites.FavoritesView
 import com.example.playlist_maker.ui.main.MainView
 import com.example.playlist_maker.ui.playlists.CreatePlaylistScreen
+import com.example.playlist_maker.ui.playlists.PlaylistDetailsScreen
 import com.example.playlist_maker.ui.playlists.PlaylistsView
 import com.example.playlist_maker.ui.playlists.PlaylistsViewModel
 import com.example.playlist_maker.ui.search.SearchView
@@ -104,7 +105,10 @@ fun AppHost(
                 modifier = Modifier,
                 playlistsViewModel = playlistsViewModel,
                 navController = navController,
-                addNewPlaylist = {navController.navigate(ScreenRoute.CreatePlaylistScreen.route)}
+                addNewPlaylist = {navController.navigate(ScreenRoute.CreatePlaylistScreen.route)},
+                onPlaylistClick = { playlistId ->
+                    navController.navigate(ScreenRoute.PlaylistDetails.createRoute(playlistId))
+                }
             )
         }
 
@@ -118,6 +122,27 @@ fun AppHost(
 
         composable(ScreenRoute.Settings.route) {
             SettingsView(navController)
+        }
+
+        composable(
+            route = "playlist/{id}",
+            arguments = listOf(
+                navArgument("id") { type = NavType.LongType }
+            )
+        ) { backStackEntry ->
+            val playlistId = backStackEntry.arguments?.getLong("id") ?: return@composable
+
+            PlaylistDetailsScreen(
+                playlistId = playlistId,
+                playlistsViewModel = playlistsViewModel,
+                onBackClick = { navController.popBackStack() },
+                onTrackClick = { track ->
+                    scope.launch {
+                        tracksRepository.saveTrack(track)
+                        navController.navigate("track/${track.id}")
+                    }
+                }
+            )
         }
 
         composable(
