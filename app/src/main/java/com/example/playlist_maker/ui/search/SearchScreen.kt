@@ -49,6 +49,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -380,10 +381,22 @@ private fun SearchResultsContent(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        "Треки не найдены",
-                        color = MaterialTheme.colorScheme.error
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.nothingfound),
+                            contentDescription = "Ничего не найдено",
+                            modifier = Modifier.size(120.dp)
+                        )
+                        Spacer(modifier = Modifier.size(16.dp))
+                        Text(
+                            text = "Ничего не нашлось",
+                            fontSize = 18.sp,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
             } else {
                 LazyColumn { // нужно передавать иммено глобальный id трэка
@@ -403,20 +416,34 @@ private fun SearchResultsContent(
         }
 
         is SearchState.Fail -> {
-            val error = screenState.error
             Box(
-                modifier = modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        "Ошибка",
-                        color = MaterialTheme.colorScheme.error
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.padding(horizontal = 24.dp)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.networkproblems),
+                        contentDescription = "Проблемы со связь��",
+                        modifier = Modifier.size(120.dp)
                     )
+                    Spacer(modifier = Modifier.size(16.dp))
                     Text(
-                        error,
-                        color = MaterialTheme.colorScheme.error,
-                        fontSize = 12.sp
+                        text = "Проблемы со связью",
+                        fontSize = 18.sp,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.size(8.dp))
+                    Text(
+                        text = "Загрузка не удалась. Проверьте подключение к интернету",
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                        lineHeight = 20.sp,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
                     )
                 }
             }
