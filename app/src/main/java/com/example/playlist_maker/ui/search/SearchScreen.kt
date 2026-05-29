@@ -44,6 +44,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -54,6 +55,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.playlist_maker.R
 import com.example.playlist_maker.data.network.Track
 
@@ -79,9 +82,15 @@ fun TrackListItem(
             horizontalAlignment = Alignment.CenterHorizontally
         )
         {
-            Image(
-                painter = painterResource(id = R.drawable.ic_music),
-                contentDescription = "Трек ${track.trackName}"
+            AsyncImage(
+                model = track.image.ifEmpty { null },
+                contentDescription = "Трек ${track.trackName}",
+                modifier = Modifier
+                    .size(60.dp)
+                    .clip(RoundedCornerShape(4.dp)),
+                contentScale = ContentScale.Crop,
+                placeholder = painterResource(id = R.drawable.ic_music),
+                error = painterResource(id = R.drawable.ic_music)
             )
         }
         Column(
