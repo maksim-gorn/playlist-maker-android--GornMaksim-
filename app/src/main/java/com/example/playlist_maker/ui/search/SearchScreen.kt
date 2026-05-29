@@ -44,15 +44,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.playlist_maker.R
 import com.example.playlist_maker.data.network.Track
 
@@ -60,14 +64,14 @@ import com.example.playlist_maker.data.network.Track
 fun TrackListItem(
     track: Track,
     onLongClick: (() -> Unit)? = null,
-    onClick: (Long) -> Unit  //передаем ID
+    onClick: (Track) -> Unit  // передаем весь Track
 ) {
     val trackId = track.id
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
-                onClick = { onClick(trackId)},  // передаем ID
+                onClick = { onClick(track)},  // передаем весь Track
                 onLongClick = { onLongClick?.invoke() }
             ),
         verticalAlignment = Alignment.CenterVertically,
@@ -78,9 +82,15 @@ fun TrackListItem(
             horizontalAlignment = Alignment.CenterHorizontally
         )
         {
-            Image(
-                painter = painterResource(id = R.drawable.ic_music),
-                contentDescription = "Трек ${track.trackName}"
+            AsyncImage(
+                model = track.image.ifEmpty { null },
+                contentDescription = "Трек ${track.trackName}",
+                modifier = Modifier
+                    .size(60.dp)
+                    .clip(RoundedCornerShape(4.dp)),
+                contentScale = ContentScale.Crop,
+                placeholder = painterResource(id = R.drawable.ic_music),
+                error = painterResource(id = R.drawable.ic_music)
             )
         }
         Column(
@@ -111,7 +121,7 @@ fun SearchView(
     navController: NavHostController? = null,
     modifier: Modifier,
     searchViewModel: SearchViewModel,
-    onClick: (Long?) -> Unit
+    onClick: (Track) -> Unit
 ) {
     val screenState by searchViewModel.searchScreenState.collectAsState()
     var historyList by remember { mutableStateOf<List<String>>(emptyList()) }
@@ -343,7 +353,7 @@ private fun SearchResultsContent(
     screenState: SearchState,
     text: String,
     modifier: Modifier,
-    onClick: (Long?) -> Unit
+    onClick: (Track) -> Unit
 ) {
     when (screenState) {
         is SearchState.Initial -> {
@@ -380,10 +390,22 @@ private fun SearchResultsContent(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        "Треки не найдены",
-                        color = MaterialTheme.colorScheme.error
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.nothingfound),
+                            contentDescription = "Ничего не найдено",
+                            modifier = Modifier.size(120.dp)
+                        )
+                        Spacer(modifier = Modifier.size(16.dp))
+                        Text(
+                            text = "Ничего не нашлось",
+                            fontSize = 18.sp,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
             } else {
                 LazyColumn { // нужно передавать иммено глобальный id трэка
@@ -393,8 +415,8 @@ private fun SearchResultsContent(
                     ) { track ->
                         TrackListItem(
                             track = track,
-                            onClick = { id ->
-                                onClick(id)
+                            onClick = { track ->
+                                onClick(track)
                             }
                         )
                     }
@@ -403,20 +425,34 @@ private fun SearchResultsContent(
         }
 
         is SearchState.Fail -> {
-            val error = screenState.error
             Box(
-                modifier = modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        "Ошибка",
-                        color = MaterialTheme.colorScheme.error
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.padding(horizontal = 24.dp)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.networkproblems),
+                        contentDescription = "Проблемы со связь��",
+                        modifier = Modifier.size(120.dp)
                     )
+                    Spacer(modifier = Modifier.size(16.dp))
                     Text(
-                        error,
-                        color = MaterialTheme.colorScheme.error,
-                        fontSize = 12.sp
+                        text = "Проблемы со связью",
+                        fontSize = 18.sp,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.size(8.dp))
+                    Text(
+                        text = "Загрузка не удалась. Проверьте подключение к интернету",
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                        lineHeight = 20.sp,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
                     )
                 }
             }

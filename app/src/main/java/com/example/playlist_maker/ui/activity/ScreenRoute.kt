@@ -8,4 +8,7 @@ sealed class ScreenRoute(val route: String) {
     object CreatePlaylistScreen: ScreenRoute("createplaylist")
     object Settings : ScreenRoute("settings")
     object Track : ScreenRoute("track")
+    object PlaylistDetails : ScreenRoute("playlist/{id}") {
+        fun createRoute(id: Long) = "playlist/$id"
+    }
 }

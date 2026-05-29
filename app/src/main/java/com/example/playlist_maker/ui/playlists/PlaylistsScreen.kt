@@ -172,6 +172,7 @@ fun PlaylistsView(
     modifier: Modifier,
     playlistsViewModel: PlaylistsViewModel,
     addNewPlaylist: () -> Unit,
+    onPlaylistClick: (Long) -> Unit,
     navController: NavHostController? = null
 ) {
     //теперь playlistsState вместо playlists
@@ -226,8 +227,7 @@ fun PlaylistsView(
                         key = { playlist -> playlist.id }
                     ) { playlist ->
                         PlaylistListItem(playlist = playlist) {
-                            // Здесь можно добавить навигацию к деталям плейлиста
-                            // navigateToPlaylist(playlist.id)
+                            onPlaylistClick(playlist.id)
                         }
                     }
                 }
