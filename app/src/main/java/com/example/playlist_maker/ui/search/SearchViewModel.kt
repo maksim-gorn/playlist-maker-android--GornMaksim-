@@ -1,14 +1,10 @@
 package com.example.playlist_maker.ui.search
 
-import android.widget.Toast
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.playlist_maker.data.network.RetrofitNetworkClient
 import com.example.playlist_maker.data.network.SearchHistoryRepositoryImpl
 import com.example.playlist_maker.data.network.TracksRepositoryImpl
-import com.example.playlist_maker.domain.TracksRepository
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,12 +13,11 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
-import kotlin.coroutines.EmptyCoroutineContext
 
 class SearchViewModel() : ViewModel() {
     private val networkClient = RetrofitNetworkClient.create()
-    private val tracksRepository = TracksRepositoryImpl(CoroutineScope(EmptyCoroutineContext), networkClient)
-    private val searchHistoryRepository = SearchHistoryRepositoryImpl(scope = viewModelScope)
+    private val tracksRepository = TracksRepositoryImpl(networkClient)
+    private val searchHistoryRepository = SearchHistoryRepositoryImpl()
     private val _searchQuery = MutableStateFlow("")
     private val _searchScreenState = MutableStateFlow<SearchState>(SearchState.Initial)
     val searchScreenState = _searchScreenState.asStateFlow()

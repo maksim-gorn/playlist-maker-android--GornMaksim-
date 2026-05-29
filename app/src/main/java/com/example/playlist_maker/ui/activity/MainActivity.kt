@@ -13,9 +13,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -47,7 +45,7 @@ class MainActivity : ComponentActivity() {
     //создать как синглтон
     private val tracksRepository: TracksRepository by lazy {
         val networkClient = RetrofitNetworkClient.create()
-        TracksRepositoryImpl(scope = lifecycleScope, networkClient = networkClient)
+        TracksRepositoryImpl(networkClient = networkClient)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

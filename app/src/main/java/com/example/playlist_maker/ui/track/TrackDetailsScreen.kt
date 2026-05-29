@@ -62,8 +62,6 @@ import com.example.playlist_maker.data.network.Track
 import com.example.playlist_maker.data.network.TracksRepositoryImpl
 import com.example.playlist_maker.domain.TracksRepository
 import com.example.playlist_maker.ui.playlists.PlaylistsViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlin.coroutines.coroutineContext
 
 //
 //@Composable
