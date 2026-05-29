@@ -35,6 +35,10 @@ class TracksRepositoryImpl(
         return database.getAllTracks()
     }
 
+    override suspend fun saveTrack(track: Track) {
+        database.insertTrack(track)
+    }
+
     override fun getTrackByNameAndArtist(track: Track): Flow<Track?> {
         return database.getTrackByNameAndArtist(track)
     }

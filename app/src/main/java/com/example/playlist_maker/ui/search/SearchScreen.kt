@@ -60,14 +60,14 @@ import com.example.playlist_maker.data.network.Track
 fun TrackListItem(
     track: Track,
     onLongClick: (() -> Unit)? = null,
-    onClick: (Long) -> Unit  //передаем ID
+    onClick: (Track) -> Unit  // передаем весь Track
 ) {
     val trackId = track.id
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
-                onClick = { onClick(trackId)},  // передаем ID
+                onClick = { onClick(track)},  // передаем весь Track
                 onLongClick = { onLongClick?.invoke() }
             ),
         verticalAlignment = Alignment.CenterVertically,
@@ -111,7 +111,7 @@ fun SearchView(
     navController: NavHostController? = null,
     modifier: Modifier,
     searchViewModel: SearchViewModel,
-    onClick: (Long?) -> Unit
+    onClick: (Track) -> Unit
 ) {
     val screenState by searchViewModel.searchScreenState.collectAsState()
     var historyList by remember { mutableStateOf<List<String>>(emptyList()) }
@@ -343,7 +343,7 @@ private fun SearchResultsContent(
     screenState: SearchState,
     text: String,
     modifier: Modifier,
-    onClick: (Long?) -> Unit
+    onClick: (Track) -> Unit
 ) {
     when (screenState) {
         is SearchState.Initial -> {
@@ -393,8 +393,8 @@ private fun SearchResultsContent(
                     ) { track ->
                         TrackListItem(
                             track = track,
-                            onClick = { id ->
-                                onClick(id)
+                            onClick = { track ->
+                                onClick(track)
                             }
                         )
                     }

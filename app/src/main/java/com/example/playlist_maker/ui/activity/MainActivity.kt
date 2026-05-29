@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.unit.dp
@@ -21,6 +22,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.playlist_maker.data.network.RetrofitNetworkClient
+import com.example.playlist_maker.data.network.Track
 import com.example.playlist_maker.data.network.TracksRepositoryImpl
 import com.example.playlist_maker.domain.TracksRepository
 import com.example.playlist_maker.ui.activity.ScreenRoute
@@ -34,6 +36,7 @@ import com.example.playlist_maker.ui.search.SearchView
 import com.example.playlist_maker.ui.search.SearchViewModel
 import com.example.playlist_maker.ui.settings.SettingsView
 import com.example.playlist_maker.ui.track.TrackDetailsScreen
+import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
@@ -67,6 +70,7 @@ fun AppHost(
     tracksRepository: TracksRepository
 ) {
     val navController = rememberNavController()
+    val scope = rememberCoroutineScope()
 
     NavHost(
         navController = navController,
@@ -79,8 +83,12 @@ fun AppHost(
             SearchView(
                 modifier = Modifier.padding(all = 1.dp),
                 searchViewModel = searchViewModel,
-                onClick = { id ->
-                    navController.navigate("track/$id")
+                onClick = { track ->
+                    //сохраняем трек в локальную БД перед открытием деталей
+                    scope.launch {
+                        tracksRepository.saveTrack(track)
+                        navController.navigate("track/${track.id}")
+                    }
                 },
                 navController = navController
             )

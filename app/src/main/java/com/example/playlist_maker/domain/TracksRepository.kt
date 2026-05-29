@@ -13,6 +13,8 @@ interface TracksRepository {
 
     suspend fun getAllTracks(): List<Track>
 
+    suspend fun saveTrack(track: Track)
+
     fun getTrackByNameAndArtist(track: Track): Flow<Track?>
 
     fun getFavoriteTracks(): Flow<List<Track>>
