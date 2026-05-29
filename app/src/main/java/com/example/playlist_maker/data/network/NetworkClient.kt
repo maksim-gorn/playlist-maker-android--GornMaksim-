@@ -1,4 +1,4 @@
-package com.example.playlist_maker.domain
+package com.example.playlist_maker.data.network
 
 import com.example.playlist_maker.data.dto.BaseResponse
 

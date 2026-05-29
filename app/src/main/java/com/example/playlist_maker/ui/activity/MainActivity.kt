@@ -20,6 +20,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.playlist_maker.data.network.RetrofitNetworkClient
 import com.example.playlist_maker.data.network.TracksRepositoryImpl
 import com.example.playlist_maker.domain.TracksRepository
 import com.example.playlist_maker.ui.activity.ScreenRoute
@@ -41,7 +42,8 @@ class MainActivity : ComponentActivity() {
 
     //создать как синглтон
     private val tracksRepository: TracksRepository by lazy {
-        TracksRepositoryImpl(scope = lifecycleScope)
+        val networkClient = RetrofitNetworkClient.create()
+        TracksRepositoryImpl(scope = lifecycleScope, networkClient = networkClient)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

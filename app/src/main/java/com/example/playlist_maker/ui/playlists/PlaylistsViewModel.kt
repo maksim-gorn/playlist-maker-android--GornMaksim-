@@ -7,6 +7,7 @@ import com.example.playlist_maker.data.DatabaseMock
 import com.example.playlist_maker.data.Playlist
 import com.example.playlist_maker.domain.PlaylistsRepository
 import com.example.playlist_maker.data.network.PlaylistsRepositoryImpl
+import com.example.playlist_maker.data.network.RetrofitNetworkClient
 import com.example.playlist_maker.data.network.Track
 import com.example.playlist_maker.data.network.TracksRepositoryImpl
 import com.example.playlist_maker.domain.TracksRepository
@@ -81,7 +82,10 @@ class PlaylistsViewModel() : ViewModel() {
     private val playlistsRepository: PlaylistsRepository =
         PlaylistsRepositoryImpl(scope = viewModelScope)
     private val tracksRepository: TracksRepository =
-        TracksRepositoryImpl(scope = viewModelScope)
+        TracksRepositoryImpl(
+            scope = viewModelScope,
+            networkClient = RetrofitNetworkClient.create()
+        )
 
     //StateFlow вместо Flow
     private val _playlistsState = MutableStateFlow<List<Playlist>>(emptyList())
