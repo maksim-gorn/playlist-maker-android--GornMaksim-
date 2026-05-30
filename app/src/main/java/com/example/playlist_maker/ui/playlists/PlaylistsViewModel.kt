@@ -3,7 +3,6 @@ package com.example.playlist_maker.ui.playlists
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.playlist_maker.data.DatabaseMock
 import com.example.playlist_maker.data.Playlist
 import com.example.playlist_maker.domain.PlaylistsRepository
 import com.example.playlist_maker.data.network.PlaylistsRepositoryImpl
@@ -80,10 +79,9 @@ import kotlinx.coroutines.launch
 
 class PlaylistsViewModel() : ViewModel() {
     private val playlistsRepository: PlaylistsRepository =
-        PlaylistsRepositoryImpl(scope = viewModelScope)
+        PlaylistsRepositoryImpl()
     private val tracksRepository: TracksRepository =
         TracksRepositoryImpl(
-            scope = viewModelScope,
             networkClient = RetrofitNetworkClient.create()
         )
 
