@@ -56,7 +56,13 @@ class SearchViewModel() : ViewModel() {
         _searchScreenState.update { SearchState.Initial }
     }
 
-    suspend fun getHistoryList() : List<Word> {
-       return searchHistoryRepository.getHistoryRequests()
+    suspend fun getHistoryList(): List<Word> {
+        return searchHistoryRepository.getHistoryRequests()
+    }
+
+    fun refreshHistory(onDone: (List<Word>) -> Unit) {
+        viewModelScope.launch {
+            onDone(searchHistoryRepository.getHistoryRequests())
+        }
     }
 }

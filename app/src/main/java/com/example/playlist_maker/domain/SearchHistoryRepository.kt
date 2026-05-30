@@ -7,5 +7,5 @@ interface SearchHistoryRepository {
 
     suspend fun getHistoryRequests(): List<Word>
 
-    fun addToHistory(word: String)
+    suspend fun addToHistory(word: String)
 }

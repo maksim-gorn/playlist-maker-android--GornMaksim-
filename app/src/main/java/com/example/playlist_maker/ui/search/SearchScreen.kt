@@ -143,8 +143,11 @@ fun SearchView(
         }
     }
 
-    LaunchedEffect(screenState) {
-        historyList = searchViewModel.getHistoryList().reversed().map { it.word }
+    // загружаем историю при фокусе (каждый раз, когда открываем выпадающий список)
+    LaunchedEffect(isFocused) {
+        if (isFocused) {
+            historyList = searchViewModel.getHistoryList().map { it.word }
+        }
     }
 
     Column(
