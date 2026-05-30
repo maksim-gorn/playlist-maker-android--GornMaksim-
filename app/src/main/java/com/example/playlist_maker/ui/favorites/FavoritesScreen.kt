@@ -1,8 +1,8 @@
 package com.example.playlist_maker.ui.favorites
 
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +22,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -36,16 +38,15 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,7 +54,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.playlist_maker.R
 import com.example.playlist_maker.data.network.Track
@@ -78,6 +78,28 @@ fun FavoritesView(
 
     val favoriteTracks by viewModel.favoriteTracksState.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    var trackToRemove by remember { mutableStateOf<Track?>(null) }
+
+    if (trackToRemove != null) {
+        AlertDialog(
+            onDismissRequest = { trackToRemove = null },
+            title = { Text("Удалить из избранного?") },
+            text = { Text("Вы уверены, что хотите удалить трек «${trackToRemove?.trackName}» из избранного?") },
+            confirmButton = {
+                Button(onClick = {
+                    trackToRemove?.let { viewModel.removeFromFavorites(it) }
+                    trackToRemove = null
+                }) {
+                    Text("Да")
+                }
+            },
+            dismissButton = {
+                Button(onClick = { trackToRemove = null }) {
+                    Text("Нет")
+                }
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -128,7 +150,8 @@ fun FavoritesView(
                                 onTrackClick = {
                                     navController.navigate("track/${track.id}")
                                 },
-                                onFavoriteClick = { viewModel.toggleFavorite(track) }
+                                onFavoriteClick = { viewModel.toggleFavorite(track) },
+                                onLongClick = { trackToRemove = track }
                             )
                         }
                     }
@@ -148,7 +171,7 @@ fun EmptyFavoritesView(modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Icon( //заглушка пока что
+            Icon(
                 imageVector = Icons.Default.FavoriteBorder,
                 contentDescription = null,
                 modifier = Modifier.size(64.dp),
@@ -164,17 +187,22 @@ fun EmptyFavoritesView(modifier: Modifier = Modifier) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FavoriteTrackItem(
     track: Track,
     onTrackClick: () -> Unit,
-    onFavoriteClick: () -> Unit, // что бы убирать из избранного
+    onFavoriteClick: () -> Unit,
+    onLongClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onTrackClick() },
+            .combinedClickable(
+                onClick = onTrackClick,
+                onLongClick = onLongClick
+            ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
@@ -183,7 +211,6 @@ fun FavoriteTrackItem(
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            //обложка трека
             Box(
                 modifier = Modifier
                     .size(48.dp)
@@ -204,7 +231,6 @@ fun FavoriteTrackItem(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            //информация о треке
             Column(
                 modifier = Modifier.weight(1f)
             ) {
@@ -223,7 +249,6 @@ fun FavoriteTrackItem(
                     overflow = TextOverflow.Ellipsis
                 )
             }
-
         }
     }
 }

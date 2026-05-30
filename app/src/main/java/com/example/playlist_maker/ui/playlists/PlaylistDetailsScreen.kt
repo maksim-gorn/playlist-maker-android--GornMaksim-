@@ -1,7 +1,8 @@
 package com.example.playlist_maker.ui.playlists
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,6 +29,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,6 +47,8 @@ import coil.compose.AsyncImage
 import com.example.playlist_maker.R
 import com.example.playlist_maker.data.Playlist
 import com.example.playlist_maker.data.network.Track
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun PlaylistDetailsScreen(
@@ -50,6 +59,32 @@ fun PlaylistDetailsScreen(
 ) {
     val playlists by playlistsViewModel.playlistsState.collectAsState()
     val playlist = playlists.find { it.id == playlistId }
+    var trackToRemove by remember { mutableStateOf<Track?>(null) }
+    val coroutineScope = rememberCoroutineScope()
+
+    if (trackToRemove != null) {
+        AlertDialog(
+            onDismissRequest = { trackToRemove = null },
+            title = { Text("Удалить трек из плейлиста?") },
+            text = { Text("Вы уверены, что хотите удалить трек «${trackToRemove?.trackName}» из этого плейлиста?") },
+            confirmButton = {
+                Button(onClick = {
+                    val track = trackToRemove
+                    trackToRemove = null
+                    coroutineScope.launch(Dispatchers.IO) {
+                        track?.let { playlistsViewModel.deleteTrackFromPlaylist(it) }
+                    }
+                }) {
+                    Text("Да")
+                }
+            },
+            dismissButton = {
+                Button(onClick = { trackToRemove = null }) {
+                    Text("Нет")
+                }
+            }
+        )
+    }
 
     if (playlist == null) {
         Box(
@@ -157,7 +192,8 @@ fun PlaylistDetailsScreen(
             ) { track ->
                 PlaylistTrackItem(
                     track = track,
-                    onClick = { onTrackClick(track) }
+                    onClick = { onTrackClick(track) },
+                    onLongClick = { trackToRemove = track }
                 )
                 HorizontalDivider(
                     thickness = 0.5.dp,
@@ -168,15 +204,20 @@ fun PlaylistDetailsScreen(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun PlaylistTrackItem(
     track: Track,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onLongClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick
+            )
             .padding(vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
