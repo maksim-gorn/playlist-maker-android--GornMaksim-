@@ -40,7 +40,18 @@ class TracksRepositoryImpl(
     }
 
     override suspend fun saveTrack(track: Track) {
-        trackDao.insertTrack(track.toEntity())
+        // сохраняем существующие isFavorite и playlistId, если трек уже в БД
+        val existing = trackDao.getTrackById(track.id).first()
+        if (existing != null) {
+            trackDao.insertTrack(
+                track.copy(
+                    favorite = existing.isFavorite,
+                    playlistId = existing.playlistId
+                ).toEntity()
+            )
+        } else {
+            trackDao.insertTrack(track.toEntity())
+        }
     }
 
     override fun getTrackByNameAndArtist(track: Track): Flow<Track?> {
@@ -55,7 +66,17 @@ class TracksRepositoryImpl(
     }
 
     override suspend fun insertTrackToPlaylist(track: Track, playlistId: Long) {
-        trackDao.insertTrack(track.copy(playlistId = playlistId).toEntity())
+        val existing = trackDao.getTrackById(track.id).first()
+        if (existing != null) {
+            trackDao.insertTrack(
+                track.copy(
+                    favorite = existing.isFavorite,
+                    playlistId = playlistId
+                ).toEntity()
+            )
+        } else {
+            trackDao.insertTrack(track.copy(playlistId = playlistId).toEntity())
+        }
     }
 
     override suspend fun deleteTrackFromPlaylist(track: Track) {
