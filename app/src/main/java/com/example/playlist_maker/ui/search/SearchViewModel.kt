@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.io.IOException
 
 class SearchViewModel() : ViewModel() {
     private val networkClient = RetrofitNetworkClient.create()
@@ -21,6 +20,7 @@ class SearchViewModel() : ViewModel() {
     private val _searchQuery = MutableStateFlow("")
     private val _searchScreenState = MutableStateFlow<SearchState>(SearchState.Initial)
     val searchScreenState = _searchScreenState.asStateFlow()
+    private var lastSearchQuery: String = ""
 
     init {
         viewModelScope.launch {
@@ -42,13 +42,22 @@ class SearchViewModel() : ViewModel() {
     private fun performSearch(request: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                lastSearchQuery = request
                 _searchScreenState.update { SearchState.Searching }
                 searchHistoryRepository.addToHistory(request)
                 val list = tracksRepository.searchTracks(expression = request)
                 _searchScreenState.update { SearchState.Success(foundList = list) }
-            } catch (e: IOException) {
-                _searchScreenState.update { SearchState.Fail(e.message.toString()) }
+            } catch (e: Exception) {
+                _searchScreenState.update {
+                    SearchState.Fail(e.message ?: "Unknown error")
+                }
             }
+        }
+    }
+
+    fun retrySearch() {
+        if (lastSearchQuery.isNotBlank()) {
+            performSearch(lastSearchQuery)
         }
     }
 
