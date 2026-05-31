@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -26,6 +27,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -219,7 +222,8 @@ fun SearchView(
                 screenState = screenState,
                 text = text,
                 modifier = modifier,
-                onClick = onClick
+                onClick = onClick,
+                onRetry = { searchViewModel.retrySearch() }
             )
         }
     }
@@ -356,7 +360,8 @@ private fun SearchResultsContent(
     screenState: SearchState,
     text: String,
     modifier: Modifier,
-    onClick: (Track) -> Unit
+    onClick: (Track) -> Unit,
+    onRetry: () -> Unit = {}
 ) {
     when (screenState) {
         is SearchState.Initial -> {
@@ -439,7 +444,7 @@ private fun SearchResultsContent(
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.networkproblems),
-                        contentDescription = "Проблемы со связь��",
+                        contentDescription = "Проблемы со связью",
                         modifier = Modifier.size(120.dp)
                     )
                     Spacer(modifier = Modifier.size(16.dp))
@@ -457,6 +462,25 @@ private fun SearchResultsContent(
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center
                     )
+                    Spacer(modifier = Modifier.size(24.dp))
+
+                    // Кнопка Retry
+                    Button(
+                        onClick = onRetry,
+                        modifier = Modifier
+                            .width(120.dp)
+                            .height(40.dp),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        Text(
+                            text = "Обновить",
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontSize = 14.sp
+                        )
+                    }
                 }
             }
         }
